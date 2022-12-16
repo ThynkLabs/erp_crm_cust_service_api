@@ -2,4 +2,4 @@ const mongoose = require('mongoose');
 mongoose.set('strictQuery', true);
 mongoose.connect(process.env.URL, {
     useNewUrlParser: true
-}).then(() => console.log('Connected!'));
+})

@@ -2,13 +2,13 @@ const Ticket = require('../DB/ticketSchema');
 const createTicket = async (req, res) => {
     const {phone,issue} = req.body;
     try {
-        var ticket =await Ticket.create({Phone:phone,Issue:issue});
+        var ticket = await Ticket.create({ Phone: phone, Issue: issue, updated_at:new Date()});
         ticket.save(function (err, result) {
             if (err) return res.send(err);
-            res.send(result);
+            res.status(200).send(result);
         });
     } catch (err) {
-        console.log(err);
+        res.send(err);
     }
 }
 
@@ -16,10 +16,10 @@ const getTickets = (req, res) => {
     try {
         Ticket.find({}, function (err, docs) {
             if (err) res.send(err);
-            res.send(docs);
+            res.status(200).send(docs);
         });
     } catch (err) {
-        console.log(err);
+        res.send(err);
     }
 }
 
@@ -32,7 +32,7 @@ const filterTicket =async (req, res) => {
                     res.send(err);
                 }
                 else {
-                    res.send(docs);
+                    res.status(200).send(docs);
                 }
             })
         }
@@ -45,7 +45,7 @@ const filterTicket =async (req, res) => {
                     }
                 }}
             ])
-            if (data) res.send(data);
+            if (data) res.status(200).send(data);
         }
         else if (from && !status && to) {
             let data = await Ticket.aggregate([
@@ -58,7 +58,7 @@ const filterTicket =async (req, res) => {
                     }
                 }
             ])
-            if (data) res.send(data);
+            if (data) res.status(200).send(data);
         }
         else if (from && status && to) {
             let data = await Ticket.aggregate([
@@ -73,27 +73,36 @@ const filterTicket =async (req, res) => {
                     }
                 }
             ])
-            if (data) res.send(data);
+            if (data) res.status(200).send(data);
         }
         else {
-            res.send('Data not found');
+            res.status(200).send('Data not found');
         }
 
     } catch (err) {
-        console.log(err);
+        res.send(err);
     }
 }
 
 const updateTicket = (req, res) => {   
     const { Id, status } = req.body;
     try {
-        Ticket.findByIdAndUpdate(Id, { Status: status },
-        function (err, docs) {
-            if (err) res.send(err);
-            else res.send("Ticket Got Updated");
+        Ticket.findById(Id, function (err, docs) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                let date = docs.updated_at;
+                date.push(new Date());
+            Ticket.findByIdAndUpdate(Id, { Status: status,updated_at:date},
+                function (err, docs) {
+                    if (err) res.send(err);
+                        else res.status(200).send("Ticket Got Updated");
+                })
+            }
         })
     } catch (err) {
-        console.log(err);
+        res.send(err);
     }
 }
 
