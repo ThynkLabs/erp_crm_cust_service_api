@@ -1,11 +1,11 @@
 const { app } = require('../index');
 const request = require('supertest');
-
+const collection = require('../DB/ticketSchema');
 //create route
 describe("Create", () => {
     let req = {
-        phone: "2345678765432eres",
-        issue: "this is demo issue"
+        phone: "2345678765432erdds",
+        issue: "this is demo"
     };
 
     describe("Create Ticket Route", () => {
@@ -14,6 +14,8 @@ describe("Create", () => {
                 const res = await request(app).post('/createTicket').send(req);
                 expect(res.statusCode).toBe(200);
                 expect(res.body.Issue).toBe(req.issue);
+                const document = await collection.findOne({ Phone: '2345678765432erdds' });
+                expect(document.Issue).toEqual('this is demo');
             })
         })
     })
@@ -46,6 +48,8 @@ describe("Update", () => {
             it("should return a 200", async () => {
                 const res = await request(app).patch('/updateTicket').send(req);
                 expect(res.statusCode).toBe(200);
+                const document = await collection.findById({ _id: req.Id });
+                expect(document.Status).toEqual(req.status);
             })
         })
     })
